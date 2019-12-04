@@ -30,7 +30,7 @@ def adjacent_equal_pair_not_group? digits
   state == :pair_found
 end
 
-possibilities = 165432.upto(707912).filter do |n|
+possibilities = 165432.upto(707912).select do |n|
   digits = n.to_s.split('').map(&:to_i)
   monotonic?(digits) && adjacent_equal_pair_not_group?(digits)
 end
