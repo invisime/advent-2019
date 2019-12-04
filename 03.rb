@@ -7,7 +7,7 @@ def set_of_segments description
 end
 
 def neighbors vector, start
-  1.upto(vector[1..].to_i).map do |i|
+  1.upto(vector[1..-1].to_i).map do |i|
     neighbor(vector, start, i)
   end
 end

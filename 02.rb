@@ -32,5 +32,5 @@ def find_inputs_for(initial, test)
   end
 end
 
-initial = File.read('02input.txt').split(',').map(&:to_i)
+initial = File.read('input02.txt').split(',').map(&:to_i)
 puts find_inputs_for(initial, 19690720)

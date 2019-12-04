@@ -4,4 +4,4 @@ def fuel_for_mass n
   extra_fuel + fuel_for_mass(extra_fuel)
 end
 
-puts File.readlines('01input.txt').map {|n| fuel_for_mass(n.to_i) }.sum
+puts File.readlines('input01.txt').map {|n| fuel_for_mass(n.to_i) }.sum
