@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 def monotonic? digits
   max_so_far = 1
   digits.each do |digit|

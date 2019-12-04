@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 def execute(intcode)
   position = 0
   loop do

@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 ORIGIN = {x: 0, y:0}
 
 def set_of_segments description
@@ -30,7 +32,7 @@ def manhattan_distance initial, final
   (final[:x] - initial[:x]).abs + (final[:y] - initial[:y]).abs
 end
 
-wires = File.readlines('03input.txt').map {|wire| set_of_segments wire}
+wires = File.readlines('input03.txt').map {|wire| set_of_segments wire}
 intersections = wires[0] & wires[1] - [ORIGIN]
 
 # puts intersections.map {|point| manhattan_distance(ORIGIN, point)}.min
