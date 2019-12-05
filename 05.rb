@@ -18,7 +18,7 @@ def execute(memory)
     when 2
       memory[params[2]] = arg0 * arg1
     when 3
-      puts 'Input:'
+      print 'Input: '
       memory[params[0]] = gets.to_i
       increment = 2
     when 4
