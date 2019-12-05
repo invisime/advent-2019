@@ -10,7 +10,7 @@ def execute(memory)
 
     arg0 = (modes[0] || 0) == 0 ? memory[params[0]] : params[0]
     arg1 = (modes[1] || 0) == 0 ? memory[params[1]] : params[1]
-    instruction_length = 4
+    increment = 4
 
     case instruction % 100
     when 1
@@ -20,15 +20,31 @@ def execute(memory)
     when 3
       puts 'Input:'
       memory[params[0]] = gets.to_i
-      instruction_length = 2
+      increment = 2
     when 4
       puts arg0
-      instruction_length = 2
+      increment = 2
+    when 5
+      increment = 3
+      if arg0 != 0 then
+        program_counter = arg1
+        increment = 0
+      end
+    when 6
+      increment = 3
+      if arg0 == 0 then
+        program_counter = arg1
+        increment = 0
+      end
+    when 7
+      memory[params[2]] = arg0 < arg1 ? 1 : 0
+    when 8
+      memory[params[2]] = arg0 == arg1 ? 1 : 0
     else
       raise "Unknown bytecode #{instruction} reached at program_counter #{program_counter}"
     end
 
-    program_counter += instruction_length
+    program_counter += increment
     raise "Program overflow #{program_counter} is beyond #{memory.length}" if program_counter >= memory.length
   end
   return memory
