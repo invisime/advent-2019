@@ -14,4 +14,4 @@ end
 
 initial = File.read('input02.txt').split(',').map(&:to_i)
 puts find_inputs_for(initial, 19690720)
-puts 'Was it 8478?'
+# puts 'Was it 8478?'
