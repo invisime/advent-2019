@@ -18,6 +18,7 @@ end
 
 least_zeroes_histogram = layer_histograms.min {|a,b| a[0] <=> b[0]}
 puts least_zeroes_histogram[1] * least_zeroes_histogram[2]
+# puts "Was it 1690?"
 
 #Part 2
 flattened_render = layer_size.times.map do |i|
@@ -32,22 +33,7 @@ flattened_render = layer_size.times.map do |i|
   end
 end
 
-BLACK = 'X'
-WHITE = ' '
-
-encoded_render = flattened_render.map do |pixel|
-  case pixel
-  when 0
-    BLACK
-  when 1
-    WHITE
-  else
-    'X'
-  end
-end
-
+encoded_render = flattened_render.map {|p| p == 0 ? ' ' : '■'}
 render = encoded_render.join.scan(/.{#{width}}/).join("\n")
-
 puts render
-
-# looks like ZPZVB but is actually ZPZUB
+# puts "Was it ZPZUB?"
