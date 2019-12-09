@@ -30,25 +30,14 @@ def feedback_simulate phase_setting
   signal
 end
 
-# example 1
-# $amplifier_control = [3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0]
-# puts simple_simulate [1,0,4,3,2]
-# puts 'Was it 65210?'
-
 # Part 1
-# phase_settings = 0.upto(4).to_a.permutation.to_a
-# thruster_signals = phase_settings.map {|phase_setting| simple_simulate phase_setting }
-# puts thruster_signals.max
-# puts "Was it 46248?"
-
-# example 2
-# $amplifier_control = [3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5]
-# puts feedback_simulate [9,8,7,6,5]
-# puts 'Was it 139629729?'
-
-# Part 1
-phase_settings = 5.upto(9).to_a.permutation.to_a
-thruster_signals = phase_settings.map {|phase_setting| feedback_simulate phase_setting }
+phase_settings = 0.upto(4).to_a.permutation.to_a
+thruster_signals = phase_settings.map {|phase_setting| simple_simulate phase_setting }
 puts thruster_signals.max
 # puts "Was it 46248?"
 
+# Part 2
+phase_settings = 5.upto(9).to_a.permutation.to_a
+thruster_signals = phase_settings.map {|phase_setting| feedback_simulate phase_setting }
+puts thruster_signals.max
+# puts "Was it 54163586?"
