@@ -7,21 +7,23 @@ def execute(program, inputs=nil, verbose=true, continue_from=0)
   memory = program.clone
   output_log = []
   program_counter = continue_from
+  relative_base = 0
   loop do
     instruction = memory[program_counter]
     break if instruction == 99
     params = memory[(program_counter + 1)..(program_counter + 3)]
     modes = instruction.to_s[0..-3].reverse.split('').map(&:to_i)
-
-    arg0 = (modes[0] || 0) == 0 ? memory[params[0]] : params[0]
-    arg1 = (modes[1] || 0) == 0 ? memory[params[1]] : params[1]
+    addresses = params.map.with_index {|p, i| modes[i] == 2 ? relative_base + p : p}
+    arg0, arg1 = (0..1).map do |i|
+      (modes[i] || 0) == 1 ? params[i] : (memory[addresses[i]] || 0)
+    end
     increment = 4
 
     case instruction % 100
     when 1
-      memory[params[2]] =  arg0 + arg1
+      memory[addresses[2]] = arg0 + arg1
     when 2
-      memory[params[2]] = arg0 * arg1
+      memory[addresses[2]] = arg0 * arg1
     when 3
       input = nil
       if use_supplied_inputs
@@ -36,7 +38,7 @@ def execute(program, inputs=nil, verbose=true, continue_from=0)
         print 'Input: '
         input = gets.to_i 
       end
-      memory[params[0]] = input
+      memory[addresses[0]] = input
       increment = 2
     when 4
       puts arg0 if verbose
@@ -55,9 +57,12 @@ def execute(program, inputs=nil, verbose=true, continue_from=0)
         increment = 0
       end
     when 7
-      memory[params[2]] = arg0 < arg1 ? 1 : 0
+      memory[addresses[2]] = arg0 < arg1 ? 1 : 0
     when 8
-      memory[params[2]] = arg0 == arg1 ? 1 : 0
+      memory[addresses[2]] = arg0 == arg1 ? 1 : 0
+    when 9
+      relative_base += arg0
+      increment = 2
     else
       raise "Unknown bytecode #{instruction} reached at program_counter #{program_counter}"
     end
