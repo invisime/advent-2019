@@ -23,7 +23,8 @@ $satellites_of = orbit_list.reduce({}) do |dict, orbit|
   dict
 end
 
-#puts $satellites_of.keys.map {|body| find_checksum body}.sum
+puts $satellites_of.keys.map {|body| find_checksum body}.sum
+# puts "Was it 186597?"
 
 $parent_of = orbit_list.reduce({}) do |dict, orbit|
   body, satellite = orbit.split(')')
@@ -35,5 +36,6 @@ my_position = address("YOU")
 santas_position = address("SAN")
 common_ancestors = my_position & santas_position
 puts ((my_position | santas_position) - common_ancestors).length
+# puts "Was it 412?"
 
 
