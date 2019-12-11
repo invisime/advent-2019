@@ -66,7 +66,7 @@ class IntcodeComputer
       @memory[ref(3)] = arg(1) == arg(2) ? 1 : 0
     when SET_RELATIVE_BASE
       @relative_base += arg(1)
-    when 99
+    when HALT
       @stopped = true
     else
       raise "Unknown bytecode #{instruction} reached at program_counter #{@program_counter}"
