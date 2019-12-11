@@ -6,25 +6,30 @@ $amplifier_control = File.read('input07.txt').split(',').map(&:to_i)
 
 def simple_simulate phase_setting
   phase_setting.reduce(0) do |signal, amp_setting|
-    _, log = execute $amplifier_control, [amp_setting, signal], false
-    log.last
+    IntcodeComputer.new(
+      memory: $amplifier_control,
+      inputs: [amp_setting, signal],
+      run_immediately: true
+    ).outputs.last
   end
 end
 
 def feedback_simulate phase_setting
   programs = phase_setting.map do |setting|
-    dump, log, pointer = execute $amplifier_control, [setting], false
-    { memory: dump, instruction: pointer}
+    IntcodeComputer.new(
+      memory: $amplifier_control,
+      inputs: [setting],
+      run_immediately: true
+    )
   end
 
   signal = 0
 
   programs.cycle do |program|
-    break unless program[:instruction]
-    dump, log, pointer = execute program[:memory], [signal], false, program[:instruction]
-    signal = log.last
-    program[:memory] = dump
-    program[:instruction] = pointer
+    break if program.complete? # counts on first amp finishing at the right time 
+    program.queue_input signal
+    program.run
+    signal = program.outputs.last
   end
 
   signal

@@ -2,12 +2,19 @@
 
 require_relative 'intcode'
 
-puts "Part 1 or 2?"
-basic_op_sys_test = File.read('input09.txt').split(',').map(&:to_i)
-execute basic_op_sys_test
+$program = File.read('input09.txt').split(',').map(&:to_i)
 
-# For 1
+def run input
+  computer = IntcodeComputer.new(memory: $program)
+  computer.queue_input input
+  computer.run
+  computer.outputs.last
+end
+
+# Part 1
+puts run 1
 # puts 'Was it 2457252183?'
 
-# For 2
+# Part 2
+puts run 2
 # puts 'Was it 70634?'

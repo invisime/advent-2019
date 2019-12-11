@@ -46,15 +46,13 @@ def simulate_painting robot_program, start_on_white=false
     },
     facing: 'north'
   }
-  memory = robot_program
-  pointer = 0
-  relative_base = 0
+  computer = IntcodeComputer.new memory: robot_program
   paint robot[:position], WHITE if start_on_white
 
-  while pointer
-    input = [color_of(robot[:position])]
-    memory, output, pointer, relative_base = execute memory, input, false, pointer, relative_base
-    new_color, direction = output
+  until computer.complete?
+    computer.queue_input color_of(robot[:position])
+    computer.run
+    new_color, direction = computer.outputs[-2..-1]
     paint robot[:position], new_color
     rotate robot, direction
     move_forward robot
