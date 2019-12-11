@@ -1,13 +1,15 @@
 #!/usr/bin/env ruby
 
+require 'pry'
+
 # Returns the state of memory, an array of output values,
 # and the current program counter (unless the program is complete).
-def execute(program, inputs=nil, verbose=true, continue_from=0)
+def execute(program, inputs=nil, verbose=true, continue_from=0, relative=0)
   use_supplied_inputs = !!inputs
   memory = program.clone
   output_log = []
   program_counter = continue_from
-  relative_base = 0
+  relative_base = relative
   loop do
     instruction = memory[program_counter]
     break if instruction == 99
@@ -32,7 +34,7 @@ def execute(program, inputs=nil, verbose=true, continue_from=0)
           puts "Supplied input: #{input}" if verbose
         else
           puts "No supplied input, pausing." if verbose
-          return memory, output_log, program_counter
+          return memory, output_log, program_counter, relative_base
         end
       else
         print 'Input: '
