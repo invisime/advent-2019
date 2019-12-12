@@ -1,74 +1,5 @@
 require_relative '../moons'
-
-EXAMPLE_INPUT =
-"<x=-1, y=0, z=2>
-<x=2, y=-10, z=-7>
-<x=4, y=-8, z=8>
-<x=3, y=5, z=-1>"
-
-PERF_EXAMPLE_INPUT =
-"<x=-8, y=-10, z=0>
-<x=5, y=5, z=10>
-<x=2, y=-7, z=3>
-<x=9, y=-8, z=-3>"
-
-EXAMPLE_VECTORS = [
-  {x:-1, y:0, z:2},
-  {x:2, y:-10, z:-7},
-  {x:4, y:-8, z:8},
-  {x:3, y:5, z:-1}
-]
-
-
-RSpec.describe Moon do
-  
-  it "tracks its own position and velocity" do
-    moon = Moon.with_position "<x=-1, y=0, z=2>"
-    moon.set_velocity_from "<x=-3, y=-2, z=1>"
-
-    expect(moon.x).to eq(-1)
-    expect(moon.y).to eq(0)
-    expect(moon.z).to eq(2)
-    expect(moon.v_x).to eq(-3)
-    expect(moon.v_y).to eq(-2)
-    expect(moon.v_z).to eq(1)
-  end
-
-  it "gravitates toward other moons" do
-    moon_a = Moon.with_position "<x=-1, y=0, z=4>"
-    moon_b = Moon.with_position "<x=1, y=0, z=2>"
-
-    moon_a.gravitate_toward! moon_b
-    moon_b.gravitate_toward! moon_a
-
-    expect(moon_a.v_x).to eq(1)
-    expect(moon_a.v_y).to eq(0)
-    expect(moon_a.v_z).to eq(-1)
-    expect(moon_b.v_x).to eq(-1)
-    expect(moon_b.v_y).to eq(0)
-    expect(moon_b.v_z).to eq(1)
-  end
-
-  it "moves per its velocity" do
-    moon = Moon.with_position "<x=-1, y=1, z=3>"
-    moon.set_velocity_from "<x=10, y=1, z=-2>"
-
-    moon.step!
-
-    expect(moon.x).to eq(9)
-    expect(moon.y).to eq(2)
-    expect(moon.z).to eq(1)
-  end
-
-  it "knows its energies" do
-    moon = Moon.with_position "<x=1, y=-8, z=0>"
-    moon.set_velocity_from "<x=-1, y=1, z=3>"
-
-    expect(moon.potential_energy).to eq(9)
-    expect(moon.kinetic_energy).to eq(5)
-    expect(moon.energy).to eq(45)
-  end
-end
+require_relative 'moon_examples'
 
 RSpec.describe Moons do
 
@@ -123,9 +54,10 @@ RSpec.describe Moons do
       expect(moon.z).to eq(position[:z])
     end
   end
-  
-  it "measures periodicity" do
+
+  it "measures periodicity at all" do
     expect(Moons.brute_force_periodicity EXAMPLE_INPUT).to eq(2772)
+    expect(Moons.periodicity EXAMPLE_INPUT).to eq(2772)
   end
   
   it "measures periodicity efficiently" do
