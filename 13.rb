@@ -18,20 +18,17 @@ class ArcadeCabinet
   end
 
   def flush_print_buffer
-    output = @game.outputs.clone
-    draw_commands = []
-    draw_commands << output.shift(3) until output.empty?
-    @screen = draw_commands.reduce([]) do |screen, command|
-      x, y, id = command
+    @screen ||= []
+    until @game.outputs.empty?
+      x, y, id = @game.outputs.shift(3)
       if [x,y] == [-1,0]
         @score = id
       else
-        screen[y] ||= []
-        screen[y][x] = id
+        @screen[y] ||= []
+        @screen[y][x] = id
         @paddle = x if id == 3
         @ball = x if id == 4
       end
-      screen
     end
   end
 
