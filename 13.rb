@@ -46,6 +46,7 @@ class ArcadeCabinet
         exit if STDIN.gets.chomp == 'q'
       end
     end
+    puts "Game over, Man! Game over!"
   end
 
   def remaining_blocks
@@ -53,7 +54,8 @@ class ArcadeCabinet
   end
 
   def render
-    puts `clear`, "SCORE #@score"
+    puts "\e[3;0H"
+    puts "SCORE #@score"
     board = @screen.map do |row|
       row.map do |tile|
         case tile
@@ -71,6 +73,7 @@ class ArcadeCabinet
       end.join
     end.join("\n")
     puts board
+    puts "Enter Ctrl+C to stop before the end of the game."
   end
 end
 
@@ -87,6 +90,5 @@ if __FILE__ == $0
   arcade = ArcadeCabinet.new true
   puts "CAUTION: This part can take a while."
   arcade.auto_play display: display, debug: step_through
-  puts arcade.score
   # puts "Was it 13824?"
 end
