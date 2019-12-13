@@ -33,24 +33,38 @@ class ArcadeCabinet
   end
 
   def auto_play display: false, debug: false
+    steps = 0
     until remaining_blocks == 0
+      steps += 1
       move = @ball <=> @paddle
       @game.queue_input move
       @game.run
-      flush_print_buffer      
-      render if display
+      flush_print_buffer
+      if display
+        render debug
+      else
+        print "." if (steps % 1000) == 0
+      end
       if debug
-        exit if STDIN.gets.chomp == 'q'
+        command = STDIN.gets.chomp
+        exit if command == 'q'
+        if command == '!'
+          debug = false 
+          print `clear`
+        end
       end
     end
-    puts "Game over, Man! Game over!"
+    puts "",
+      "Game over, Man! Game over!",
+      "#{steps} taken.",
+      "Final score: #@score"
   end
 
   def remaining_blocks
     @screen.flatten.select {|id| id == 2}.length
   end
 
-  def render
+  def render show_instructions
     puts "\e[3;0H"
     puts "SCORE #@score"
     board = @screen.map do |row|
@@ -70,7 +84,13 @@ class ArcadeCabinet
       end.join
     end.join("\n")
     puts board
-    puts "Enter Ctrl+C to stop before the end of the game."
+    if show_instructions
+      puts "Press Enter to step forward.",
+        "Enter '!' to switch to auto-advance.",
+        "Enter 'q' to quit."
+    else 
+      puts "Press Ctrl+C to stop before the end of the game.\n\n"
+    end
   end
 end
 
@@ -78,14 +98,15 @@ if __FILE__ == $0
   step_through = ARGV.include?("slowly")
   display = step_through || ARGV.include?("show-me-your-moves")
 
+  print `clear` if display
+
   # Part 1
   arcade = ArcadeCabinet.new
-  puts arcade.remaining_blocks
+  puts "#{arcade.remaining_blocks} blocks to break."
   #puts "Was it 296?"
 
   # Part 2
   arcade = ArcadeCabinet.new true
-  puts "CAUTION: This part can take a while."
   arcade.auto_play display: display, debug: step_through
   # puts "Was it 13824?"
 end
