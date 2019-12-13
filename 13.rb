@@ -56,7 +56,6 @@ class ArcadeCabinet
     end
     puts "",
       "Game over, Man! Game over!",
-      "#{steps} taken.",
       "Final score: #@score"
   end
 
