@@ -1,21 +1,5 @@
 require_relative '../reactions'
-
-EXAMPLES =
-"10 ORE => 10 A
-1 ORE => 1 B
-7 A, 1 B => 1 C
-7 A, 1 C => 1 D
-7 A, 1 D => 1 E
-7 A, 1 E => 1 FUEL".split("\n")
-
-COMPLEX_EXAMPLE = 
-"9 ORE => 2 A
-8 ORE => 3 B
-7 ORE => 5 C
-3 A, 4 B => 1 AB
-5 B, 7 C => 1 BC
-4 C, 1 A => 1 CA
-2 AB, 3 BC, 4 CA => 1 FUEL".split("\n")
+require_relative 'reactions_examples'
 
 RSpec.describe Reactions do
   
@@ -36,15 +20,17 @@ RSpec.describe Reactions do
     expect(reactions.minimum_ore_for 1, "FUEL").to eq(31)
   end
 
-  it "should calculate necessary ore in complex systems" do
-    leftovers = Hash.new{0}
-    reactions = Reactions.new COMPLEX_EXAMPLE
+  COMPLEX_EXAMPLES.each do |answer, example|
+    it "should calculate that necessary ore for example #{answer}" do
+      reactions = Reactions.new example
 
-    ore = reactions.minimum_ore_for 1, "FUEL", leftovers
+      expect(reactions.minimum_ore_for 1, "FUEL").to eq(answer)
+    end
+  end
 
-    expect(reactions.minimum_ore_for 10, "A").to eq(45)
-    expect(reactions.minimum_ore_for 24, "B").to eq(64)
-    expect(reactions.minimum_ore_for 40, "C").to eq(56)
-    expect(ore).to eq(165)
+  it "should calculate fuel for a trillion ore" do
+    reactions = Reactions.new COMPLEX_EXAMPLES[13312]
+    
+    expect(reactions.fuel_for_ore 1e12.to_i).to eq(82892753)
   end
 end
