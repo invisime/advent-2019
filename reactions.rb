@@ -2,7 +2,7 @@ require_relative 'reaction'
 
 class Reactions
 
-  attr_accessor :all, :by_result
+  attr_accessor :all, :by_result, :ore_per_fuel
 
   def initialize equations
     @all = equations.map {|equation| Reaction.new equation }
@@ -10,22 +10,20 @@ class Reactions
       dictionary[reaction.result.chemical] = reaction
       dictionary
     end
+    @ore_per_fuel = minimum_ore_for 1, "FUEL"
   end
 
   def fuel_for_ore ore
-    ore_per_fuel = minimum_ore_for 1, "FUEL"
     materials = Hash.new{0}
     materials["ORE"] = ore
-    fuel = 0
+    fuel_for_ore_worker materials
+  end
 
-    loop do
-      minimum_fuel_produced = (materials["ORE"] / ore_per_fuel).floor
-      break if minimum_fuel_produced < 1
-      fuel += minimum_fuel_produced
-      ore_used = minimum_ore_for minimum_fuel_produced, "FUEL", materials, false
-    end
-
-    fuel
+  def fuel_for_ore_worker materials
+    minimum_fuel_produced = (materials["ORE"] / @ore_per_fuel).floor
+    ore_used = minimum_ore_for minimum_fuel_produced, "FUEL", materials, false
+    return 0 if minimum_fuel_produced < 1
+    minimum_fuel_produced + fuel_for_ore_worker(materials)
   end
 
   def minimum_ore_for quantity, chemical, existing_quantities=Hash.new{0}, ore_is_plentiful=true
