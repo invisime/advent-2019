@@ -12,16 +12,15 @@ RSpec.describe FFT do
       12345678,
       48226158,
       34040438,
-      3415518,
-      1029498
+       3415518,
+       1029498
     ]
 
-    fft = FFT.new expected_signals[0]
+    fft = FFT.from_i expected_signals[0]
     expected_signals.each.with_index do |expected_signal, i|
       expect(fft.phase).to eq(i)
       expect(fft.signal).to eq(expected_signal)
-      expect(fft.magnitude).to eq(8)
-      fft = fft.next
+      fft.next!
     end
   end
 
@@ -33,10 +32,22 @@ RSpec.describe FFT do
     }
 
     expected.each do |input, expected_short_signal|
-      fft = FFT.new input
-      100.times { fft = fft.next }
+      fft = FFT.from_i input
+      100.times { fft.next! }
       expect(fft.phase).to eq(100)
       expect(fft.short_signal).to eq(expected_short_signal)
     end
+  end
+
+  it "cheats and goes backwards if you ask for something ridiculous" do
+    fft = FFT.from_i 12345678
+
+    expect(fft.lazy_find! 1, 7, 1).to eq(8)
+    expect(fft.lazy_find! 4, 5, 2).to eq(49)
+  end
+
+  it "does this because you give it really big things to do sometimes" do
+    fft = FFT.from_repeating_s "03036732577212944063491565474664"
+    expect(fft.lazy_find!).to eq(84462026)
   end
 end
