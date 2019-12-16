@@ -8,10 +8,6 @@ class FFT
 
   attr_reader :digits
 
-  def signal
-    @digits.join.to_i
-  end
-
   def initialize digits
     @digits = digits
   end
@@ -46,6 +42,10 @@ class FFT
     end.rotate.cycle.take(how_many)
   end
   
+  def signal
+    @digits.join.to_i
+  end
+
   def short_signal offset=0, length=8
     @digits[offset, length].map{|d| d % 10}.join.to_i
   end
@@ -74,14 +74,6 @@ class FFT
       end
     end
     future_digits[0, length].map{|d| d[-1] % 10}.join.to_i
-  end
-
-  def lazier_next! offset
-    cursor = @digits[-1]
-    2.upto(@digits.length - offset).each do |from_the_back|
-      cursor = @digits[-from_the_back] += cursor
-    end
-    self
   end
 end
 
