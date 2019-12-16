@@ -50,21 +50,7 @@ class FFT
     @digits[offset, length].map{|d| d % 10}.join.to_i
   end
 
-  def lazy_find! phase=100, offset=nil, length=8
-    offset ||= @digits[0,7].join.to_i
-    phase.times { lazy_next! offset }
-    short_signal offset, length
-  end
-
-  def lazy_next! offset
-    cursor = @digits[-1]
-    2.upto(@digits.length - offset).each do |from_the_back|
-      @digits[-from_the_back] = cursor = (@digits[-from_the_back] + cursor) % 10
-    end
-    self
-  end
-
-  def lazier_find! phases=100, offset=nil, length=8
+  def lazy_find phases=100, offset=nil, length=8
     offset ||= @digits[0,7].join.to_i
     width = @digits.length - offset
     future_digits = @digits[-width..-1].map{|d| [d] * (phases + 1) }
@@ -79,24 +65,17 @@ end
 
 if __FILE__ == $0
   
-  raw_signal = File.read('input16.txt')
+  raw_signal = File.read('input16.txt').strip
 
   # Part 1
-  fft = FFT.from_i raw_signal.strip.to_i
+  fft = FFT.from_i raw_signal.to_i
   100.times { fft.next! }
   puts fft.short_signal
-  puts "Was it 90744714?"
+  # puts "Was it 90744714?"
 
   # Part 2
-  puts 'lazy_find!'
   fft = FFT.from_repeating_s raw_signal
-  output = fft.lazy_find!
+  output = fft.lazy_find
   puts output
-  puts "womp womp" if output == 18993332
-
-  puts 'lazier_find!'
-  fft = FFT.from_repeating_s raw_signal
-  output = fft.lazier_find!
-  puts output
-  puts "womp womp" if output == 18993332
+  # puts "Was it 82994322"
 end

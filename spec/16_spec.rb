@@ -38,10 +38,8 @@ RSpec.describe FFT do
   end
 
   it "cheats and goes backwards if you ask for something ridiculous" do
-    expect(FFT.from_i(12345678).lazy_find! 1, 7, 1).to eq(8)
-    expect(FFT.from_i(12345678).lazy_find! 4, 5, 2).to eq(49)
-    expect(FFT.from_i(12345678).lazier_find! 1, 7, 1).to eq(8)
-    expect(FFT.from_i(12345678).lazier_find! 4, 5, 2).to eq(49)
+    expect(FFT.from_i(12345678).lazy_find 1, 7, 1).to eq(8)
+    expect(FFT.from_i(12345678).lazy_find 4, 5, 2).to eq(49)
   end
 
   it "does this because you give it really big things to do sometimes" do
@@ -51,8 +49,7 @@ RSpec.describe FFT do
       ["03081770884921959731165446850517", 53553731]
     ].each do |test|
       input, expected = test
-      expect(FFT.from_repeating_s(input).lazy_find!).to eq(expected)
-      expect(FFT.from_repeating_s(input).lazier_find!).to eq(expected)
+      expect(FFT.from_repeating_s(input).lazy_find).to eq(expected)
     end
   end
 end
