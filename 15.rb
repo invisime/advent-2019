@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 
 require_relative 'intcode'
-require 'io/console'
-require 'pry'
 
 WALL = 0
 EMPTY = 1
@@ -12,7 +10,6 @@ SOUTH = 2
 WEST = 3
 EAST = 4
 COMPASS = [NORTH, EAST, SOUTH, WEST]
-READABLE = [nil, "NORTH", "WEST", "SOUTH", "EAST"]
 
 class Coordinates
   attr_reader :x, :y
@@ -132,7 +129,11 @@ if __FILE__ == $0
   robot = Robot.new
   origin = Node.origin robot
   path_to_oxygen = origin.path_to_oxygen
+  puts path_to_oxygen.length
+  # puts "Was it 272?"
+
   oxygen = origin.follow path_to_oxygen
   longest_path = oxygen.path_to_farthest_point
-  binding.pry
+  puts longest_path.length
+  # puts "Was it 272?"
 end
