@@ -37,21 +37,6 @@ class FFT
     end
   end
 
-  def lazy_find! phase=100, offset=nil, length=8
-    offset ||= @digits[0,7].join.to_i
-    phase.times { lazy_next! offset }
-    short_signal offset, length
-  end
-
-  def lazy_next! offset
-    cursor = @digits[-1]
-    2.upto(@digits.length - offset).each do |from_the_back|
-      cursor += @digits[-from_the_back]
-      @digits[-from_the_back] = cursor %= 10
-    end
-    self
-  end
-
   @@pattern_dictionary = {}
   def self.pattern_for n, how_many=nil
     how_many ||= n * BASE_PATTERN.length
@@ -62,13 +47,48 @@ class FFT
   end
   
   def short_signal offset=0, length=8
-    @digits[offset, length].join.to_i
+    @digits[offset, length].map{|d| d % 10}.join.to_i
+  end
+
+  def lazy_find! phase=100, offset=nil, length=8
+    offset ||= @digits[0,7].join.to_i
+    phase.times { lazy_next! offset }
+    short_signal offset, length
+  end
+
+  def lazy_next! offset
+    cursor = @digits[-1]
+    2.upto(@digits.length - offset).each do |from_the_back|
+      @digits[-from_the_back] = cursor = (@digits[-from_the_back] + cursor) % 10
+    end
+    self
+  end
+
+  def lazier_find! phases=100, offset=nil, length=8
+    offset ||= @digits[0,7].join.to_i
+    width = @digits.length - offset
+    future_digits = @digits[-width..-1].map{|d| [d] * (phases + 1) }
+    (width - 2).downto(0).each do |d|
+      phases.times do |phase|
+        future_digits[d][phase + 1] = (future_digits[d][phase] + future_digits[d + 1][phase + 1]) % 10
+      end
+    end
+    future_digits[0, length].map{|d| d[-1] % 10}.join.to_i
+  end
+
+  def lazier_next! offset
+    cursor = @digits[-1]
+    2.upto(@digits.length - offset).each do |from_the_back|
+      cursor = @digits[-from_the_back] += cursor
+    end
+    self
   end
 end
 
 if __FILE__ == $0
   
   raw_signal = File.read('input16.txt')
+
   # Part 1
   fft = FFT.from_i raw_signal.strip.to_i
   100.times { fft.next! }
@@ -76,8 +96,15 @@ if __FILE__ == $0
   puts "Was it 90744714?"
 
   # Part 2
+  puts 'lazy_find!'
   fft = FFT.from_repeating_s raw_signal
   output = fft.lazy_find!
+  puts output
   puts "womp womp" if output == 18993332
-  binding.pry
+
+  puts 'lazier_find!'
+  fft = FFT.from_repeating_s raw_signal
+  output = fft.lazier_find!
+  puts output
+  puts "womp womp" if output == 18993332
 end
