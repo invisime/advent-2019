@@ -6,7 +6,7 @@ class FFT
 
   BASE_PATTERN = [0, 1, 0, -1]
 
-  attr_reader :phase, :digits
+  attr_reader :digits
 
   def signal
     @digits.join.to_i
@@ -14,7 +14,6 @@ class FFT
 
   def initialize digits
     @digits = digits
-    @phase = 0
   end
 
   def self.from_i signal
@@ -27,7 +26,6 @@ class FFT
 
   def next!
     @digits = calculate
-    @phase += 1
     self
   end
 
@@ -45,14 +43,13 @@ class FFT
     short_signal offset, length
   end
 
-  def lazy_next! start_at
-    @digits[start_at..-1] = lazy_calculate start_at
-  end
-
-  def lazy_calculate offset
-    (offset).upto(@digits.length).map do |digit|
-      @digits[digit..-1].sum % 10
+  def lazy_next! offset
+    cursor = @digits[-1]
+    2.upto(@digits.length - offset).each do |from_the_back|
+      cursor += @digits[-from_the_back]
+      @digits[-from_the_back] = cursor %= 10
     end
+    self
   end
 
   @@pattern_dictionary = {}
@@ -70,9 +67,9 @@ class FFT
 end
 
 if __FILE__ == $0
-
-  # Part 1
+  
   raw_signal = File.read('input16.txt')
+  # Part 1
   fft = FFT.from_i raw_signal.strip.to_i
   100.times { fft.next! }
   puts fft.short_signal
@@ -80,5 +77,7 @@ if __FILE__ == $0
 
   # Part 2
   fft = FFT.from_repeating_s raw_signal
-  puts fft.lazy_find! 100
+  output = fft.lazy_find!
+  puts "womp womp" if output == 18993332
+  binding.pry
 end
