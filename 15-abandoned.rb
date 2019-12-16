@@ -15,22 +15,18 @@ COMPASS = [NORTH, EAST, SOUTH, WEST]
 
 class Robot
 
-  attr_reader :x, :y, :facing, :visited, :could_visit
+  attr_reader :x, :y, :facing, :visited
 
   def initialize free_play=false
     @brain = IntcodeComputer.from_file "input15.txt"
     @brain.run
     @x, @y, @facing = 0, 0, NORTH
-    @visited, @could_visit = [], []
+    @visited = {}
   end
 
   def direction keypress
     valid_direction = ' wsad'.index keypress
     valid_direction || nil
-  end
-
-  def know_about
-    @visited | @could_visit
   end
 
   def neighbor wasd
@@ -57,7 +53,7 @@ class Robot
   def step wasd
     @facing = wasd
     location = neighbor(wasd)
-    return WALL if @know_about[location] == WALL
+    return WALL if @visited.include? location == WALL
 
     command = direction(wasd)
     return unless command
@@ -83,7 +79,7 @@ class Robot
   def peek!
     original_facing = @facing
     choices = COMPASS.reduce([]) do |new_empty_directions, wasd|
-      next new_empty_directions if @know_about.include? neighbor(wasd)
+      next new_empty_directions if @visited.include? neighbor(wasd)
       type = step wasd
       unless type == WALL
         step opposite(wasd)
@@ -95,15 +91,15 @@ class Robot
     choices
   end
 
-  # def peek
-  #   peek!.each {|direction| @visited.delete(neighbor direction)}
-  # end
+  def peek
+    new_spaces = peek!
+    new_spaces.each {|wasd| @visited.delete neighbor(wasd)}
+  end
 
   def interactive_mode
     print `clear`
     feedback = ""
     peek
-    @visited 
     loop do
       puts "\e[3;0H"
       MindVisualizer.display self
