@@ -20,6 +20,8 @@ class IntcodeComputer
   attr_reader :outputs
   attr_reader :inputs
 
+  attr_accessor :interactive
+
   def initialize memory:, inputs: [], run_immediately: false
     @memory = memory.clone
     @program_counter = 0
@@ -29,9 +31,9 @@ class IntcodeComputer
     run if run_immediately
   end
 
-  def self.from_file path
-    program = File.read(path).split(',').map(&:to_i)
-    IntcodeComputer.new memory: program
+  def self.from_file path, run_immediately: false
+    program = File.read(path).strip.split(',').map(&:to_i)
+    IntcodeComputer.new memory: program, run_immediately: run_immediately
   end
 
   def run
@@ -48,14 +50,19 @@ class IntcodeComputer
       @memory[ref(3)] = arg(1) * arg(2)
     when READ
       input = @inputs.shift
-      if input 
+      if input
         @memory[ref(1)] = input
       else
-        @stopped = true
+        if @interactive
+          queue_input *gets.split(//).map(&:ord)
+        else
+          @stopped = true
+        end
         @program_counter -= advance
       end
     when WRITE
       @outputs << arg(1)
+      print arg(1).chr if @interactive
     when JUMP_IF_NOT_ZERO
       @program_counter = arg(2) - advance if arg(1) != 0
     when JUMP_IF_ZERO
