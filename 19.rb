@@ -49,18 +49,15 @@ class Droid
   end
 
   def left_edge_only_survey limit=@limit, first_row=0, first_column=nil, size:
-    start = first_column || first_row
-    first_row.upto(first_row + limit - 1) do |row|
+    left_end = first_column || first_row
+    first_row.upto(first_row + limit) do |y|
       leftmost = nil
-      (start + 1).downto(0) do |column|
-        status = survey_point(row, column)
+      (left_end + limit).downto(left_end) do |x|
+        status = survey_point(x, y)
         break if status == SAFE && !leftmost.nil?
-        leftmost = column if status == TRACTORED
+        leftmost = x if status == TRACTORED
       end
-      if !leftmost.nil? && is_bottom_left_square?(row, leftmost, size)
-        return { x: leftmost, y: row - size + 1 } 
-      end
-      start = leftmost || row / 2
+      start = leftmost || (y + 1) * 2
     end
     puts "No square found before row #{first_row + limit - 1}"
   end
@@ -70,7 +67,7 @@ class Droid
       [bottom, left],
       [bottom - size + 1, left + size - 1]
     ]
-    corner_statuses = corners.map {|row_column| survey_point row_column[0], row_column[1] }
+    corner_statuses = corners.map {|xy| survey_point xy[0], xy[1] }
     corner_statuses.all? TRACTORED
   end
 
@@ -101,7 +98,7 @@ class Droid
   end
 
   def survey_point x, y
-    # puts "looking: #{x},#{y}"
+    puts "looking: #{x},#{y}"
     return @map[y][x] unless @map[y][x] == UNEXPLORED
     status = IntcodeComputer.new(
       memory: Droid::program,
@@ -111,18 +108,19 @@ class Droid
     @max_x = [x, @max_x || 0].max
     @min_y = [y, @min_y || Float::INFINITY].min
     @max_y = [y, @max_y || 0].max
+    puts "found: #{x},#{y}" if status == TRACTORED
     @map[y][x] = status
   end
 
   def flat_map
-    @min_y.upto(@max_y).reduce("") do |flat, row|
-      flat + flat_row(row)
+    @min_y.upto(@max_y).reduce("") do |flat, y|
+      flat + flat_row(y)
     end
   end
 
-  def flat_row row
-    @min_x.upto(@max_x).reduce("") do |flat, column|
-      flat + TILES[map[row][column]]
+  def flat_row y
+    @min_x.upto(@max_x).reduce("") do |flat, x|
+      flat + TILES[map[y][x]]
     end
   end
 
@@ -133,17 +131,17 @@ end
 
 if __FILE__ == $0
   # Part 1
-  droid = Droid.new 50
-  puts droid.flat_map.count TILES[TRACTORED]
-  puts "Was it 152?"
+  # droid = Droid.new 50
+  # puts droid.flat_map.count TILES[TRACTORED]
+  # puts "Was it 152?"
   
   # Part 2
-  # droid = Droid.new
+  droid = Droid.new
 
   # #def edge_only_surveys limit=@limit, first_row=0, first_column=nil, size:
 
   # size = 5
-  # puts left_coords = droid.left_edge_only_survey(100, size:3)
+  puts left_coords = droid.left_edge_only_survey(30, size:3)
   # puts right_coords = droid.right_edge_only_survey(100, size:3)
   
   # droid.survey droid.max_y - droid.min_y + 1, droid.min_y
