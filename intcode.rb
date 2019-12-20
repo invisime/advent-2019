@@ -10,7 +10,21 @@ class IntcodeComputer
   EQUALS = 8
   SET_RELATIVE_BASE = 9
   HALT = 99
-  
+
+  INCREMENTS = {
+    HALT => 0,
+    ADD => 4,
+    MULTIPLY => 4,
+    LESS_THAN => 4,
+    EQUALS => 4,
+    JUMP_IF_NOT_ZERO => 3,
+    JUMP_IF_ZERO => 3,
+    READ => 2,
+    WRITE => 2,
+    SET_RELATIVE_BASE => 2
+  }
+
+  MODE_POSITIONS = [nil, 100, 1000, 10000]
   IMMEDIATE = 1
   RELATIVE = 2
 
@@ -20,7 +34,7 @@ class IntcodeComputer
   attr_reader :outputs
   attr_reader :inputs
 
-  attr_accessor :interactive
+  attr_accessor :interactive, :verbose
 
   def initialize memory:, inputs: [], run_immediately: false
     @memory = memory.clone
@@ -43,6 +57,7 @@ class IntcodeComputer
 
   def step
     advance = increment
+    binding.pry if advance.nil?
     case instruction
     when ADD
       @memory[ref(3)] = arg(1) + arg(2)
@@ -78,21 +93,8 @@ class IntcodeComputer
     else
       raise "Unknown bytecode #{instruction} reached at program_counter #{@program_counter}"
     end
-    # puts "Did instruction #{instruction} at #{@program_counter}"
+    puts "Did instruction #{instruction} at #{@program_counter}" if @verbose
     @program_counter += advance
-  end
-
-  def increment
-    case instruction
-    when ADD, MULTIPLY, LESS_THAN, EQUALS
-      4
-    when JUMP_IF_NOT_ZERO, JUMP_IF_ZERO
-      3
-    when READ, WRITE, SET_RELATIVE_BASE
-      2
-    else
-      0
-    end
   end
 
   def opcode
@@ -101,6 +103,10 @@ class IntcodeComputer
 
   def instruction
     opcode % 100
+  end
+
+  def increment
+    INCREMENTS[instruction]
   end
 
   def ref n
@@ -117,8 +123,13 @@ class IntcodeComputer
     @inputs += inputs
   end
 
+  # going right to left, the parameter modes are 0 (hundreds digit),
+  # 1 (thousands digit),
+  # and 0 (ten-thousands digit, not present and therefore zero)
+
   def mode n
-    opcode.to_s[0..-3].reverse.split('').map(&:to_i)[n - 1] || 0
+    binding.pry if MODE_POSITIONS[n].nil?
+    opcode / MODE_POSITIONS[n] % 10
   end
 
   def complete?
