@@ -1,0 +1,32 @@
+J means should_jump?
+T means whatever we're calcuating now
+
+readings A B C D / E F G H I (ones after slash only available in running mode)
+false = space
+true = hole
+
+D = destination
+AND D J as last ensures we jump onto ground
+is_solid? X => OR X *
+
+------
+OR A T  # T = solid at A
+AND B T # T = solid at A & B
+AND C T # T = solid at A & B & C
+NOT T J # J = at least one gap 
+AND D J #  J = at least one gap in (A-C) & D is solid
+WALK
+------
+
+        # J = jump possible and necessary soon
+OR A T  # T = solid at A
+AND B T # T = solid at A & B
+AND C T # T = solid at A & B & C
+NOT T J # J = at least one gap in jumpable range (must jump soon)
+AND D J # J = jump needed soon and D is solid (jump possible)
+
+        # J = jump is also "not instant death"
+OR E T  # T = E is solid
+OR H T  # T = E or H is solid ergo "not instant death"
+AND T J # J = possible, necessary, has non-lethal options
+RUN
