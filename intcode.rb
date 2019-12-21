@@ -61,8 +61,15 @@ class IntcodeComputer
         @program_counter -= advance
       end
     when WRITE
-      @outputs << arg(1)
-      print arg(1).chr if @interactive
+      out = arg(1)
+      @outputs << out
+      if @interactive
+        if out < 2**8
+          print out.chr
+        else
+          puts out
+        end
+      end
     when JUMP_IF_NOT_ZERO
       @program_counter = arg(2) - advance if arg(1) != 0
     when JUMP_IF_ZERO
