@@ -2,6 +2,7 @@ require_relative '../20'
 
 EXAMPLE_20_A = File.read('example20a.txt')
 EXAMPLE_20_B = File.read('example20b.txt')
+EXAMPLE_20_C = File.read('example20c.txt')
 
 RSpec.describe DonutMaze do
   it "A knows how the location of the various portals" do
@@ -20,6 +21,12 @@ RSpec.describe DonutMaze do
 
     expect(maze.edge_costs[maze.origin][maze.destination]).to eq(26)
     expect(maze.best_path maze.origin, maze.destination).to eq(23)
+  end
+
+  it "A can tell if a location is on the outer edge" do
+    maze = DonutMaze.new EXAMPLE_20_A
+
+    expect maze.is_outer? 
   end
 
   it "B knows how the length of the best route to ZZ" do

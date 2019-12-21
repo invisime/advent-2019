@@ -29,7 +29,7 @@ end
 class DonutMaze
 
   attr_reader :width, :flat, :portals, :edge_costs,
-    :portal_links, :origin, :destination, :name_of
+    :portal_links, :origin, :destination
 
   def initialize maze
     @width = maze.index /\n/
@@ -132,15 +132,17 @@ class DonutMaze
       0 <= i && i < @flat.length && @flat[i] =~ /[\.A-Z]/
     end
   end
-
-  # def graph
-  #   @edge_costs.reduce({}) do |graph, node|
-  #     puts "#{node[0]} can reach #{node[1]}"
-  #   end
-  # end
+  
+  def name_of location
+    @name_of[location]
+  end
 
   def render
     @flat.scan(/.{#{width}}/).gsub('#',' ').join "\n"
+  end
+
+  def is_outer? position
+    
   end
 end
 
