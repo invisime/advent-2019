@@ -5,7 +5,7 @@ EXAMPLE_20_B = File.read('example20b.txt')
 EXAMPLE_20_C = File.read('example20c.txt')
 
 RSpec.describe DonutMaze do
-  it "A knows how the location of the various portals" do
+  it "A knows the location of the various portals" do
     maze = DonutMaze.new EXAMPLE_20_A
     
     entry = 6 * maze.width + 9      # 135
@@ -16,7 +16,7 @@ RSpec.describe DonutMaze do
     expect(maze.portal_links[other_end]).to eq(entry)
   end
 
-  it "A knows how the length of the best route to ZZ" do
+  it "A knows the length of the best route to ZZ" do
     maze = DonutMaze.new EXAMPLE_20_A
 
     expect(maze.edge_costs[maze.origin][maze.destination]).to eq(26)
@@ -26,10 +26,23 @@ RSpec.describe DonutMaze do
   it "A can tell if a location is on the outer edge" do
     maze = DonutMaze.new EXAMPLE_20_A
 
-    expect maze.is_outer? 
+    expect(maze.is_outer? 51).to eq(true)
+    expect(maze.is_outer? 170).to eq(true)
+    expect(maze.is_outer? 135).to eq(false)
+    expect(maze.is_outer? 275).to eq(true)
+    expect(maze.is_outer? 216).to eq(false)
+    expect(maze.is_outer? 317).to eq(true)
+    expect(maze.is_outer? 263).to eq(false)
+    expect(maze.is_outer? 349).to eq(true)
   end
 
-  it "B knows how the length of the best route to ZZ" do
+  it "A knows the length of the best level conscious route to ZZ" do
+    maze = DonutMaze.new EXAMPLE_20_A
+
+    expect(maze.best_level_conscious_path maze.origin, maze.destination).to eq(26)
+  end
+
+  it "B knows the length of the best route to ZZ" do
     maze = DonutMaze.new EXAMPLE_20_B
 
     expect(maze.edge_costs[maze.origin]).not_to include(maze.destination)

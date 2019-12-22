@@ -28,11 +28,12 @@ end
 
 class DonutMaze
 
-  attr_reader :width, :flat, :portals, :edge_costs,
-    :portal_links, :origin, :destination
+  attr_reader :width, :height, :flat, :portals,
+    :edge_costs, :portal_links, :origin, :destination
 
   def initialize maze
     @width = maze.index /\n/
+    @height = maze.length / width
     @flat = maze.split(/\n/).join
     scan_portals
     scout_edge_costs
@@ -52,7 +53,6 @@ class DonutMaze
 
       return best_distance[to] if node == to
 
-      any_updates = false
       neighbors = @edge_costs[node].keys
       neighbors.each do |child|
         alternate = best_distance[node] + @edge_costs[node][child]
@@ -60,13 +60,56 @@ class DonutMaze
           # puts "\tnew distance to #{@name_of[child]}(#{child}) is #{alternate}"
           best_distance[child] = alternate
           best_parent[child] = node
-          any_updates = true
         end
       end
 
       unexplored.replace(unexplored)
     end
     raise "Could not reach #{to} from #{from}"
+  end
+
+  def best_level_conscious_path from, to
+    best_distance = Hash.new { Float::INFINITY }
+    best_parent = Hash.new
+    start = {i: from, level: 0}
+    goal = {i: to, level: 0}
+    best_distance[start] = 0
+    seen = []
+    unexplored = PQueue.new([start]) {|a,b| best_distance[a] < best_distance[b] }
+    until unexplored.empty?
+      door = unexplored.pop
+      seen.push door
+      node, level = door[:i], door[:level]
+
+      puts "expanding #{@name_of[node]} (level #{level}) at distance #{best_distance[door]}"
+      return best_distance[goal] if door == goal
+
+      neighbors = @edge_costs[node].keys.map do |destination|
+        up_or_down = 0
+        if @edge_costs[node][destination] == 1
+          up_or_down = is_outer?(node) ? -1 : 1
+        end
+        {i: destination, level: level + up_or_down }
+      end
+      neighbors.delete_if {|c| seen.include? c}
+      neighbors.delete_if {|c| c[:level] < 0}
+      neighbors.delete_if {|c| c != goal && ["AA", "ZZ"].include?(name_of(c[:i]))}
+      neighbors.each do |child_door|
+        child_i, child_level = child_door[:i], child_door[:level]
+        # binding.pry if child_i < 0
+        alternate = best_distance[door] + @edge_costs[node][child_i]
+        if alternate < best_distance[child_door]
+          puts "\tnew distance to #{@name_of[child_i]} (level #{child_level}) is #{alternate}"
+          best_distance[child_door] = alternate
+          best_parent[child_door] = node
+          unexplored.push child_door
+        end
+      end
+
+      unexplored.replace(unexplored)
+    end
+    raise "Could not reach #{to} from #{from}"
+
   end
 
   def scout_edge_costs
@@ -138,18 +181,22 @@ class DonutMaze
   end
 
   def render
-    @flat.scan(/.{#{width}}/).gsub('#',' ').join "\n"
+    @flat.gsub('#',' ').scan(/.{#{width}}/).join "\n"
   end
 
   def is_outer? position
-    
+    x, y = position % width, position / width
+    y == 2 || x == 2 || y == height - 3 || x == width - 3
   end
 end
 
-
 if __FILE__ == $0
   maze = DonutMaze.new File.read('input20.txt')
+  # maze = DonutMaze.new File.read('example20a.txt')
   
   # Part 1
-  puts maze.best_path maze.origin, maze.destination
+  # puts maze.best_path maze.origin, maze.destination
+
+  # Part 2
+  puts maze.best_level_conscious_path maze.origin, maze.destination
 end
